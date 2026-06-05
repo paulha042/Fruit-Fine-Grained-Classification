@@ -1,4 +1,4 @@
-# Fine-Grained Fruit Classification (COMP8430 — Group 2, Phase 3)
+# Fine-Grained Fruit Classification
 
 A deep learning pipeline for fine-grained classification of 20 fruit varieties, featuring an IEL-inspired architecture with Multi-Layer Grad-CAM voting and domain adaptation to robot-captured images.
 
