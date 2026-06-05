@@ -2,9 +2,7 @@
 
 A deep learning pipeline for fine-grained classification of 20 fruit varieties, featuring an IEL-inspired architecture with Multi-Layer Grad-CAM voting and domain adaptation to robot-captured images.
 
-
-https://github.com/user-attachments/assets/e4c5c183-afec-4800-8795-d5b037dd24bd
-
+https://github.com/user-attachments/assets/855c800d-d8ca-4512-9e9f-bbca84757943
 
 
 ---
