@@ -33,19 +33,20 @@ The dataset contains 20 fruit classes spread across four fruit groups:
 
 <img width="1906" height="1070" alt="Image" src="https://github.com/user-attachments/assets/18a8eb3c-b286-47c8-970a-a87c885c6480" />
 
-Our model architecture is inspired by ensemble machine learning methods. A Random Forest, for example, is built from many individual decision trees arranged in a tree structure — each tree sees the data slightly differently and votes on the final prediction. No single tree is trusted on its own; the strength comes from combining many weak learners into one robust decision.
+My model architecture is inspired by ensemble machine learning methods. A Random Forest, for example, is built from many individual decision trees arranged in a tree structure — each tree sees the data slightly differently and votes on the final prediction. No single tree is trusted on its own; the strength comes from combining many weak learners into one robust decision.
 
-We apply the same intuition to our deep learning model. EfficientNet-B3 is made up of seven blocks of Mobile Inverted Convolutional (MBConv) layers, and each block processes the image at a different level of abstraction — earlier blocks respond to edges and textures, while deeper blocks respond to higher-level shapes and object parts. Rather than relying only on the final block's output, we **tap** multiple blocks and combine their perspectives, just as a Random Forest combines multiple trees.
+I apply the same intuition to our deep learning model. EfficientNet-B3 is made up of seven blocks of Mobile Inverted Convolutional (MBConv) layers, and each block processes the image at a different level of abstraction — earlier blocks respond to edges and textures, while deeper blocks respond to higher-level shapes and object parts. Rather than relying only on the final block's output, I **tap** multiple blocks and combine their perspectives, just as a Random Forest combines multiple trees.
 
 ### Tapping Pipeline
 
-<img width="1904" height="1070" alt="image" src="https://github.com/user-attachments/assets/a8f34320-3ebe-46ba-9cc1-1ff284321198" />
+<img width="1904" height="1070" alt="image" src="https://github.com/user-attachments/assets/1584fedc-6b4d-48c1-a6cf-2d6422dbcdca" />
+
 
 Normally, when an input image passes through EfficientNet-B3, each block produces an output that is passed to the next block — and those intermediate outputs are discarded. In my architecture, I intercept them.
 
-From testing, Blocks 1–5 tend to focus on whole-image context or background regions rather than the fruit itself. I therefore tap **Block 6, Block 7, and the convolutional head** — the three deepest points where features are most discriminative — and feed copies of those feature maps into our IEL head.
+From testing, Blocks 1–5 tend to focus on whole-image context or background regions rather than the fruit itself. I therefore tap **Block 6, Block 7, and the convolutional head**, which are the three deepest points where features are most discriminative — and feed copies of those feature maps into the IEL head.
 
-These tapped features are used to generate a **Multi-Layer Grad-CAM heatmap**, which asks: *where is the model actually looking?* I then check whether that heatmap overlaps with the fruit foreground (estimated via GrabCut) rather than background clutter like shelves or packaging. If the overlap passes a threshold, the heatmap guides targeted augmentation — either enlarging the focal fruit region or blurring everything outside it.
+These tapped features are used to generate a **Multi-Layer Grad-CAM heatmap**, which asks: *where is the model actually looking?* I then check whether that heatmap overlaps with the fruit foreground (estimated via GrabCut) rather than background clutter like shelves or packaging. If the overlap passes a threshold, the heatmap guides targeted augmentation to either enlarge the focal fruit region or blur everything outside it.
 
 The key insight is that tapping multiple deep layers produces more reliable and better-localised heatmaps than using the final layer alone, which in turn makes the augmentation more targeted and more effective.
 
@@ -163,7 +164,7 @@ The notebook is designed to run in **Google Colab** with data stored on Google D
 ## Key Design Decisions
 
 - **No color augmentation** — fine-grained fruit classification is sensitive to color and shape; MixUp, CutOut, and color jitter were excluded as they alter discriminative fruit appearance.
-- **EfficientNet-B3 over larger models** — compound scaling provides richer features per parameter (10.7M) compared to ResNet50 (23.5M), with better generalisation to robot images.
+- **EfficientNet-B3 over larger models** — compound scaling provides richer features per parameter compared to ResNet50, with better generalisation to robot images.
 - **Single unfreeze block in Stage 1** — unfreezing more blocks caused attention to drift to backgrounds; keeping only the top block focused Grad-CAM on the fruit.
 
 ---
